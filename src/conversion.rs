@@ -1,22 +1,17 @@
-use std::io::{Read, BufReader};
 use std::collections::HashMap;
+use std::io::{BufReader, Read};
 
 use lazy_static::lazy_static;
 
 lazy_static! {
     static ref BASE_64_TABLE: Vec<char> = {
         vec![
-            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
-            'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
-            'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
-            'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f',
-            'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
-            'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
-            'w', 'x', 'y', 'z', '0', '1', '2', '3',
-            '4', '5', '6', '7', '8', '9', '+', '/',
-        ] 
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
+            'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
+            'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y',
+            'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/',
+        ]
     };
-
     static ref ASCII_HEX_TABLE: HashMap<u8, u8> = {
         let mut table = HashMap::new();
 
@@ -59,11 +54,8 @@ pub fn string_to_base64(string: &str) -> String {
 }
 
 pub fn hex_to_base64(hex_string: &str) -> String {
-    let hex_bytes: Vec<u8> = hex_string
-        .bytes()
-        .map(|b| ASCII_HEX_TABLE[&b])
-        .collect();
-    
+    let hex_bytes: Vec<u8> = hex_string.bytes().map(|b| ASCII_HEX_TABLE[&b]).collect();
+
     let bytes: Vec<u8> = hex_bytes
         .as_slice()
         .chunks(2)
@@ -81,7 +73,7 @@ pub fn bytes_to_base64(bytes: &[u8]) -> String {
         1 => {
             padding.push(0);
             padding.push(0);
-        },
+        }
         2 => padding.push(0),
         _ => (),
     }
@@ -100,7 +92,10 @@ pub fn bytes_to_base64(bytes: &[u8]) -> String {
         result.push(working_buffer[2] & MASK_3);
     }
 
-    result.into_iter().map(|c| BASE_64_TABLE[c as usize]).collect()
+    result
+        .into_iter()
+        .map(|c| BASE_64_TABLE[c as usize])
+        .collect()
 }
 
 #[cfg(test)]

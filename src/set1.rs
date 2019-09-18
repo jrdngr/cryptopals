@@ -5,7 +5,6 @@
 // output: SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t
 //
 // Rule: Always operate on raw bytes, never on encoded strings. Only use hex and base64 for
-// pretty-printing. 
+// pretty-printing.
 
-pub fn challenge_1() {
-}
+pub fn challenge_1() {}
