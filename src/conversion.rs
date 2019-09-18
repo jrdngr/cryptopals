@@ -69,7 +69,7 @@ pub fn bytes_to_base64(bytes: &[u8]) -> String {
     let length = bytes.len();
     let mut padding = Vec::new();
 
-    match length {
+    match length % 3 {
         1 => {
             padding.push(0);
             padding.push(0);
@@ -80,8 +80,6 @@ pub fn bytes_to_base64(bytes: &[u8]) -> String {
 
     let padded_bytes = [bytes, padding.as_slice()].concat();
 
-    crate::utils::print_bits(&padded_bytes);
-
     let mut reader = BufReader::new(padded_bytes.as_slice());
 
     let mut working_buffer: [u8; 3] = [0, 0, 0];
@@ -90,12 +88,9 @@ pub fn bytes_to_base64(bytes: &[u8]) -> String {
     while let Ok(()) = reader.read_exact(&mut working_buffer) {
         result.push((working_buffer[0] & MASK_1) >> 2);
         result.push((working_buffer[0] & !MASK_1) << 4 | (working_buffer[1] & MASK_2) >> 4);
-        result.push((working_buffer[1] & !MASK_2) << 2 | (working_buffer[2] & !MASK_3 >> 4));
+        result.push((working_buffer[1] & !MASK_2) << 2 | (working_buffer[2] & !MASK_3 >> 6));
         result.push(working_buffer[2] & MASK_3);
     }
-
-    println!("-------");
-    crate::utils::print_bits(&result);
 
     result
         .into_iter()
