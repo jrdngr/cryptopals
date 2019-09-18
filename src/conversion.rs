@@ -1,5 +1,6 @@
 use std::io::{BufReader, Read};
 
+#[rustfmt::skip]
 const BASE_64_TABLE: [char; 64] = [
     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
     'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
@@ -28,7 +29,7 @@ pub fn string_to_base64(string: &str) -> String {
 }
 
 pub fn hex_to_base64(hex_string: &str) -> String {
-    let hex_bytes: Vec<u8> = hex_string.bytes().map(|b| ascii_hex_to_byte(b)).collect();
+    let hex_bytes: Vec<u8> = hex_string.bytes().map(ascii_hex_to_byte).collect();
 
     let bytes: Vec<u8> = hex_bytes
         .as_slice()
@@ -63,7 +64,7 @@ pub fn bytes_to_base64(bytes: &[u8]) -> String {
         result.push((working_buffer[0] & 0b1111_1100) >> 2);
         result.push((working_buffer[0] & 0b0000_0011) << 4 | (working_buffer[1] & 0b1111_0000) >> 4);
         result.push((working_buffer[1] & 0b0000_1111) << 2 | (working_buffer[2] & 0b1100_0000 >> 6));
-        result.push(working_buffer[2] & 0b0011_1111);
+        result.push( working_buffer[2] & 0b0011_1111);
     }
 
     result
