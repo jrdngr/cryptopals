@@ -1,3 +1,4 @@
+pub mod byte_operations;
 pub mod conversion;
 pub mod set1;
 pub mod utils;
