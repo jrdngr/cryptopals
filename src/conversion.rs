@@ -11,18 +11,6 @@ const BASE_64_TABLE: [char; 64] = [
     '8', '9', '+', '/',
 ];
 
-fn ascii_hex_to_byte(hex: u8) -> u8 {
-    if hex >= 48 && hex <= 57 {
-        hex - 48
-    } else if hex >= 65 && hex <= 70 {
-        hex - 55
-    } else if hex >= 97 && hex <= 102 {
-        hex - 87
-    } else {
-        panic!("Invalid hex character: {}", hex);
-    }
-}
-
 pub fn string_to_base64(string: &str) -> String {
     let bytes = string.bytes().collect::<Vec<u8>>();
     bytes_to_base64(&bytes)
@@ -63,7 +51,7 @@ pub fn bytes_to_base64(bytes: &[u8]) -> String {
     while let Ok(()) = reader.read_exact(&mut working_buffer) {
         result.push((working_buffer[0] & 0b1111_1100) >> 2);
         result.push((working_buffer[0] & 0b0000_0011) << 4 | (working_buffer[1] & 0b1111_0000) >> 4);
-        result.push((working_buffer[1] & 0b0000_1111) << 2 | (working_buffer[2] & 0b1100_0000 >> 6));
+        result.push((working_buffer[1] & 0b0000_1111) << 2 | (working_buffer[2] & 0b1100_0000) >> 6);
         result.push( working_buffer[2] & 0b0011_1111);
     }
 
@@ -71,6 +59,18 @@ pub fn bytes_to_base64(bytes: &[u8]) -> String {
         .into_iter()
         .map(|c| BASE_64_TABLE[c as usize])
         .collect()
+}
+
+fn ascii_hex_to_byte(hex: u8) -> u8 {
+    if hex >= 48 && hex <= 57 {
+        hex - 48
+    } else if hex >= 65 && hex <= 70 {
+        hex - 55
+    } else if hex >= 97 && hex <= 102 {
+        hex - 87
+    } else {
+        panic!("Invalid hex character: {}", hex);
+    }
 }
 
 #[cfg(test)]
