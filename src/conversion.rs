@@ -79,13 +79,14 @@ mod tests {
 
     #[test]
     fn test_convert() {
-        assert_eq!("T3ch", string_to_base64("Ow!"))
+        assert_eq!(string_to_base64("Ow!"), "T3ch")
     }
 
     #[test]
     fn test_convert_complex() {
-        assert_eq!(
-            "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t",
-            hex_to_base64("49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d"));
+        let test_string = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d";
+        let expected_output = "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t";
+
+        assert_eq!(hex_to_base64(test_string), expected_output);
     }
 }
