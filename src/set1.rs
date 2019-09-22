@@ -9,7 +9,7 @@ use crate::byte_operations::bytes_xor;
 // Rule: Always operate on raw bytes, never on encoded strings. Only use hex and base64 for
 // pretty-printing.
 #[test]
-pub fn challenge1() {
+pub fn challenge_1() {
     let expected_output = "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t";
 
     let test_string = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d";
@@ -37,4 +37,14 @@ pub fn challenge_2() {
     let result = bytes_to_hex_string(&result_bytes);
      
     assert_eq!(result, expected_output);
+}
+
+//  The hex encoded string:
+// 1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736
+// ... has been XOR'd against a single character. Find the key, decrypt the message.
+// You can do this by hand. But don't: write code to do it for you.
+// How? Devise some method for "scoring" a piece of English plaintext. Character frequency is a good metric. Evaluate each output and choose the one with the best score. 
+#[test]
+pub fn challange_3() {
+
 }
