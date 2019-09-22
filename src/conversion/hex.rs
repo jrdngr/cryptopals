@@ -14,10 +14,8 @@ pub fn hex_string_to_bytes(hex_string: &str) -> Vec<u8> {
 pub fn bytes_to_hex_string(bytes: &[u8]) -> String {
     let result: Vec<[char; 2]> = bytes
         .iter()
-        .map(byte_to_ascii_hex)
+        .map(|b| byte_to_ascii_hex_pair(*b))
         .collect();
-
-    dbg!(&result);
 
     result.iter().flatten().collect()
 }
@@ -34,10 +32,20 @@ pub fn ascii_hex_to_byte(hex: u8) -> u8 {
     }
 }
 
-pub fn byte_to_ascii_hex(byte: &u8) -> [char; 2] {
-    let c1 = (byte & 0b1111_0000 >> 4) as char;
-    let c2 = (byte & 0b0000_1111) as char;
-    [c1, c2]
+pub fn byte_to_ascii_hex_pair(byte: u8) -> [char; 2] {
+    let c1 = (byte & 0b1111_0000) >> 4;
+    let c2 = byte & 0b0000_1111;
+    [byte_to_ascii_hex(c1), byte_to_ascii_hex(c2)]
+}
+
+pub fn byte_to_ascii_hex(byte: u8) -> char {
+    if byte <= 9 {
+        (byte + 48) as char
+    } else if byte >=10 && byte <= 15 {
+        (byte + 87) as char
+    } else {
+        panic!("Invalid hex value: {}", byte);
+    }
 }
 
 #[cfg(test)]
