@@ -1,5 +1,4 @@
 use crate::conversion::base64::hex_to_base64;
-// use crate::conversion
 
 // Convert hex to base64
 // input: 49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d
@@ -7,10 +6,12 @@ use crate::conversion::base64::hex_to_base64;
 //
 // Rule: Always operate on raw bytes, never on encoded strings. Only use hex and base64 for
 // pretty-printing.
+#[test]
+pub fn challenge1() {
+        let test_string = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d";
+        let expected_output = "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t";
 
-pub fn challenge_1() {
-    let test_string = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d";
-    println!("{}", hex_to_base64(test_string));
+        assert_eq!(hex_to_base64(test_string), expected_output);
 }
 
 

@@ -1,10 +1,10 @@
 pub mod byte_operations;
 pub mod conversion;
-pub mod set1;
 pub mod utils;
 
-use crate::set1::challenge_1;
+#[cfg(test)]
+pub mod set1;
 
 fn main() {
-    challenge_1();
+    println!("Use 'cargo test' to verify challenge completion");
 }
