@@ -1,4 +1,4 @@
-use crate::conversion::base64::hex_to_base64;
+use crate::conversion::base64::{hex_to_base64, bytes_to_base64};
 use crate::conversion::hex::{hex_string_to_bytes, bytes_to_hex_string};
 use crate::byte_operations::bytes_xor;
 
@@ -45,6 +45,17 @@ pub fn challenge_2() {
 // You can do this by hand. But don't: write code to do it for you.
 // How? Devise some method for "scoring" a piece of English plaintext. Character frequency is a good metric. Evaluate each output and choose the one with the best score. 
 #[test]
-pub fn challange_3() {
+pub fn challenge_3() {
+    let encoded = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736";
 
+    let bytes = hex_string_to_bytes(encoded);
+    let len = bytes.len();
+    
+    for val in 0..15 {
+        let other: Vec<u8> = vec![val; len];
+        let result = bytes_xor(&bytes, &other);
+        let result_string = std::str::from_utf8(&result).unwrap();
+        println!("{}", val);
+        println!("{}", result_string);
+    }
 }
