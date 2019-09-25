@@ -1,6 +1,6 @@
 use crate::conversion::base64::hex_to_base64;
 use crate::conversion::hex::{hex_string_to_bytes, bytes_to_hex_string};
-use crate::byte_operations::{bytes_xor, bytes_xor_single_byte};
+use crate::byte_operations::{bytes_xor};
 
 // Convert hex to base64
 // input: 49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d
@@ -46,6 +46,7 @@ pub fn challenge_2() {
 // How? Devise some method for "scoring" a piece of English plaintext. Character frequency is a good metric. Evaluate each output and choose the one with the best score. 
 #[test]
 pub fn challenge_3() {
+    use crate::ciphers::single_byte_xor;
     use std::collections::HashMap;
 
     let bytes = hex_string_to_bytes("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736");
@@ -56,7 +57,7 @@ pub fn challenge_3() {
     for xor_byte in 0..127 {
         let mut character_counts: HashMap<u8, usize> = HashMap::new();
 
-        let result_bytes = bytes_xor_single_byte(&bytes, xor_byte);
+        let result_bytes = single_byte_xor(&bytes, xor_byte);
         let result_string = std::str::from_utf8(&result_bytes).unwrap().to_string();
 
         for byte in result_bytes {
