@@ -101,10 +101,20 @@ pub fn challenge_3() {
 // Get a feel for it. I promise, we aren't wasting your time with this.
 #[test]
 pub fn challenge_4() {
+    use crate::ciphers::repeating_key_xor;
+
     let input_line_1 = "Burning 'em, if you ain't quick and nimble";
     let input_line_2 = "I go crazy when I hear a cymbal";
     let key = "ICE";
 
-    let expected_output_line_1 = "0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272";
-    let expected_output_line_2 = "a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f";
+    let expected_output_line_1 = hex_string_to_bytes("0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272");
+    let expected_output_line_2 = hex_string_to_bytes("a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f");
+
+    let key_bytes = hex_string_to_bytes(key);
+
+    // let result_line_1 = repeating_key_xor(input_line_1.as_bytes(), &key_bytes);
+    // let result_line_2 = repeating_key_xor(input_line_2.as_bytes(), &key_bytes);
+
+    // assert_eq!(result_line_1, expected_output_line_1);
+    // assert_eq!(result_line_2, expected_output_line_2);
 }
