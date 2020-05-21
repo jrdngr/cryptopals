@@ -1,6 +1,6 @@
+use crate::byte_operations::bytes_xor;
 use crate::conversion::base64::hex_to_base64;
-use crate::conversion::hex::{hex_string_to_bytes, bytes_to_hex_string};
-use crate::byte_operations::{bytes_xor};
+use crate::conversion::hex::{bytes_to_hex_string, hex_string_to_bytes};
 
 // Convert hex to base64
 // input: 49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d
@@ -18,7 +18,6 @@ pub fn challenge_1() {
     assert_eq!(result, expected_output);
 }
 
-
 // Write a function that takes two equal-length buffers and produces their XOR combination.
 // If your function works properly, then when you feed it the string:
 // 1c0111001f010100061a024b53535009181c
@@ -32,10 +31,10 @@ pub fn challenge_2() {
 
     let bytes1 = hex_string_to_bytes("1c0111001f010100061a024b53535009181c");
     let bytes2 = hex_string_to_bytes("686974207468652062756c6c277320657965");
-    
+
     let result_bytes = bytes_xor(&bytes1, &bytes2);
     let result = bytes_to_hex_string(&result_bytes);
-     
+
     assert_eq!(result, expected_output);
 }
 
@@ -43,14 +42,15 @@ pub fn challenge_2() {
 // 1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736
 // ... has been XOR'd against a single character. Find the key, decrypt the message.
 // You can do this by hand. But don't: write code to do it for you.
-// How? Devise some method for "scoring" a piece of English plaintext. Character frequency is a good metric. Evaluate each output and choose the one with the best score. 
+// How? Devise some method for "scoring" a piece of English plaintext. Character frequency is a good metric. Evaluate each output and choose the one with the best score.
 #[test]
 pub fn challenge_3() {
     use crate::ciphers::single_byte_xor;
     use std::collections::HashMap;
 
-    let bytes = hex_string_to_bytes("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736");
-    
+    let bytes =
+        hex_string_to_bytes("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736");
+
     let mut result: HashMap<String, usize> = HashMap::new();
 
     // UTF-8 error beyond 127. Ignoring for now.
@@ -66,7 +66,7 @@ pub fn challenge_3() {
         }
 
         fn is_letter(character: u8) -> bool {
-            (character >= 65 && character <= 90) || (character >= 97 && character <=122)
+            (character >= 65 && character <= 90) || (character >= 97 && character <= 122)
         }
 
         let score: usize = character_counts
@@ -78,7 +78,11 @@ pub fn challenge_3() {
         result.insert(result_string, score);
     }
 
-    let message = result.into_iter().max_by_key(|(_, score)| score.clone()).unwrap().0;
+    let message = result
+        .into_iter()
+        .max_by_key(|(_, score)| score.clone())
+        .unwrap()
+        .0;
 
     assert_eq!(message, "Cooking MC's like a pound of bacon");
 }
@@ -97,7 +101,7 @@ pub fn challenge_3() {
 // 0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272
 // a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f
 
-// Encrypt a bunch of stuff using your repeating-key XOR function. Encrypt your mail. Encrypt your password file. Your .sig file. 
+// Encrypt a bunch of stuff using your repeating-key XOR function. Encrypt your mail. Encrypt your password file. Your .sig file.
 // Get a feel for it. I promise, we aren't wasting your time with this.
 #[test]
 pub fn challenge_4() {
@@ -107,8 +111,12 @@ pub fn challenge_4() {
     let input_line_2 = "I go crazy when I hear a cymbal";
     let key = "ICE";
 
-    let expected_output_line_1 = hex_string_to_bytes("0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272");
-    let expected_output_line_2 = hex_string_to_bytes("a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f");
+    let expected_output_line_1 = hex_string_to_bytes(
+        "0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272",
+    );
+    let expected_output_line_2 = hex_string_to_bytes(
+        "a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f",
+    );
 
     let key_bytes = hex_string_to_bytes(key);
 

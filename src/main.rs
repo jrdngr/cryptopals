@@ -1,6 +1,6 @@
 pub mod byte_operations;
-pub mod conversion;
 pub mod ciphers;
+pub mod conversion;
 pub mod utils;
 
 #[cfg(test)]
