@@ -118,9 +118,9 @@ pub fn challenge_4() {
 
     let key_bytes = hex_string_to_bytes(key);
 
-    // let result_line_1 = repeating_key_xor(input_line_1.as_bytes(), &key_bytes);
-    // let result_line_2 = repeating_key_xor(input_line_2.as_bytes(), &key_bytes);
+    let result_line_1 = repeating_key_xor(input_line_1.as_bytes(), &key_bytes);
+    let result_line_2 = repeating_key_xor(input_line_2.as_bytes(), &key_bytes);
 
-    // assert_eq!(result_line_1, expected_output_line_1);
-    // assert_eq!(result_line_2, expected_output_line_2);
+    assert_eq!(result_line_1, expected_output_line_1);
+    assert_eq!(result_line_2, expected_output_line_2);
 }
