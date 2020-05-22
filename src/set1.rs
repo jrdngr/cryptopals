@@ -65,13 +65,11 @@ pub fn challenge_3() {
             *count += 1;
         }
 
-        fn is_letter(character: u8) -> bool {
-            (character >= 65 && character <= 90) || (character >= 97 && character <= 122)
-        }
-
         let score: usize = character_counts
             .into_iter()
-            .filter(|(character, _)| is_letter(*character))
+            .filter(|(character, _)| {
+                (*character >= 65 && *character <= 90) || (*character >= 97 && *character <= 122)
+            })
             .map(|(character, count)| character as usize * count)
             .sum();
 
