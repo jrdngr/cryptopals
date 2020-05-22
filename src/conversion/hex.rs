@@ -14,13 +14,8 @@ pub fn hex_string_to_bytes(hex_string: &str) -> Vec<u8> {
 
 pub fn bytes_to_hex_string(bytes: &[u8]) -> String {
     let result: Vec<[char; 2]> = bytes.iter().map(|b| byte_to_ascii_hex_pair(*b)).collect();
-
-    let start = match result.get(0) {
-        Some([n, _]) => if *n == '0' { 1 } else { 0 },
-        None => 0,
-    };
-
-    result.iter().flatten().skip(start).collect()
+    
+    result.iter().flatten().collect()
 }
 
 pub fn ascii_hex_to_byte(hex: u8) -> u8 {

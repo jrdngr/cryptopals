@@ -1,3 +1,4 @@
+use crate::decode;
 use crate::byte_operations::bytes_xor;
 use crate::conversion::base64::hex_to_base64;
 use crate::conversion::hex::{bytes_to_hex_string, hex_string_to_bytes};
@@ -45,44 +46,42 @@ pub fn challenge_2() {
 // How? Devise some method for "scoring" a piece of English plaintext. Character frequency is a good metric. Evaluate each output and choose the one with the best score.
 #[test]
 pub fn challenge_3() {
-    use crate::ciphers::single_byte_xor;
-    use std::collections::HashMap;
-
     let bytes =
         hex_string_to_bytes("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736");
 
-    let mut result: HashMap<String, usize> = HashMap::new();
-
-    // UTF-8 error beyond 127. Ignoring for now.
-    for xor_byte in 0..127 {
-        let mut character_counts: HashMap<u8, usize> = HashMap::new();
-
-        let result_bytes = single_byte_xor(&bytes, xor_byte);
-        let result_string = std::str::from_utf8(&result_bytes).unwrap().to_string();
-
-        for byte in result_bytes {
-            let count = character_counts.entry(byte).or_insert(0);
-            *count += 1;
-        }
-
-        let score: usize = character_counts
-            .into_iter()
-            .filter(|(character, _)| {
-                (*character >= 65 && *character <= 90) || (*character >= 97 && *character <= 122)
-            })
-            .map(|(character, count)| character as usize * count)
-            .sum();
-
-        result.insert(result_string, score);
-    }
-
-    let message = result
-        .into_iter()
-        .max_by_key(|(_, score)| score.clone())
-        .unwrap()
-        .0;
+    let (message, _) = decode::single_byte_xor(&bytes);
 
     assert_eq!(message, "Cooking MC's like a pound of bacon");
+}
+
+// One of the 60-character strings in the file 4.txt has been encrypted by single-character XOR.
+// Find it.
+// (Your code from #3 should help.) 
+#[test]
+fn challenge_4() {
+    use std::collections::HashMap;
+    use std::io::{BufRead, BufReader};
+    use std::fs::File;
+
+    let file = File::open("files/4.txt").unwrap();
+    let reader = BufReader::new(file);
+
+    let mut results = HashMap::new();
+
+    for line in reader.lines() {
+        let line = line.unwrap();
+        let bytes = hex_string_to_bytes(&line);
+        let (message, score) = decode::single_byte_xor(&bytes);
+        results.insert(score, message);
+    }
+
+
+    let (message, _) = results
+        .into_iter()
+        .max_by_key(|(_, score)| score.clone())
+        .unwrap();
+
+    dbg!(message);
 }
 
 // Implement repeating-key XOR
@@ -102,25 +101,21 @@ pub fn challenge_3() {
 // Encrypt a bunch of stuff using your repeating-key XOR function. Encrypt your mail. Encrypt your password file. Your .sig file.
 // Get a feel for it. I promise, we aren't wasting your time with this.
 #[test]
-pub fn challenge_4() {
+pub fn challenge_5() {
     use crate::ciphers::repeating_key_xor;
 
     let input_line_1 = "Burning 'em, if you ain't quick and nimble";
     let input_line_2 = "I go crazy when I hear a cymbal";
     let key = "ICE";
 
-    let expected_output_line_1 = hex_string_to_bytes(
-        "0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272",
-    );
-    let expected_output_line_2 = hex_string_to_bytes(
-        "a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f",
-    );
-
-    let key_bytes = hex_string_to_bytes(key);
+    let key_bytes: Vec<u8> = key.bytes().collect();
 
     let result_line_1 = repeating_key_xor(input_line_1.as_bytes(), &key_bytes);
+    let result_line_1 = bytes_to_hex_string(&result_line_1);
+    
     let result_line_2 = repeating_key_xor(input_line_2.as_bytes(), &key_bytes);
+    let result_line_2 = bytes_to_hex_string(&result_line_2);
 
-    assert_eq!(result_line_1, expected_output_line_1);
-    assert_eq!(result_line_2, expected_output_line_2);
+    assert_eq!(result_line_1, "0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272");
+    assert_eq!(result_line_2, "a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f");
 }
