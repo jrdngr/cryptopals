@@ -2,15 +2,14 @@ use std::collections::HashMap;
 
 use crate::ciphers::single_byte_xor as encode_single_byte_xor;
 
-pub fn single_byte_xor(bytes: &[u8]) -> (String, usize) {
+pub fn single_byte_xor<B: AsRef<[u8]>>(bytes: B) -> (String, usize) {
     let mut result: HashMap<String, usize> = HashMap::new();
 
-    // UTF-8 error beyond 127. Ignoring for now.
-    for xor_byte in 0..127 {
+    for xor_byte in 0..255 {
         let mut character_counts: HashMap<u8, usize> = HashMap::new();
 
-        let result_bytes = encode_single_byte_xor(&bytes, xor_byte);
-        let result_string = std::str::from_utf8(&result_bytes).unwrap().to_string();
+        let result_bytes = encode_single_byte_xor(bytes.as_ref(), xor_byte);
+        let result_string = String::from_utf8_lossy(&result_bytes).into_owned();
 
         for byte in result_bytes {
             let count = character_counts.entry(byte).or_insert(0);

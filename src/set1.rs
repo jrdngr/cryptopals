@@ -71,17 +71,19 @@ fn challenge_4() {
     for line in reader.lines() {
         let line = line.unwrap();
         let bytes = hex_string_to_bytes(&line);
+
         let (message, score) = decode::single_byte_xor(&bytes);
         results.insert(score, message);
     }
 
 
-    let (message, _) = results
+    let (score, message) = results
         .into_iter()
         .max_by_key(|(_, score)| score.clone())
         .unwrap();
 
     dbg!(message);
+    dbg!(score);
 }
 
 // Implement repeating-key XOR
