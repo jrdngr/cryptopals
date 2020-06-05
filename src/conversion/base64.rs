@@ -23,19 +23,6 @@ pub fn hex_to_base64(hex_string: &str) -> String {
     bytes_to_base64(&bytes)
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 #[rustfmt::skip]
 pub fn bytes_to_base64(bytes: &[u8]) -> String {
     let padding_count = match bytes.len() % 3 {
@@ -77,17 +64,6 @@ pub fn bytes_to_base64(bytes: &[u8]) -> String {
         .collect()
 }
 
-
-
-
-
-
-
-
-
-
-
-
 pub fn base_64_character_to_byte(c: u8) -> u8 {
     if c >= 65 && c <= 90 {
         c - 65
@@ -106,29 +82,49 @@ pub fn base_64_character_to_byte(c: u8) -> u8 {
     }
 }
 
+pub fn base64_to_hex_string<B: AsRef<[u8]>>(base64: B) -> String {
+    bytes_to_hex_string(&base64_to_bytes(base64))
+}
+
 #[rustfmt::skip]
 pub fn base64_to_bytes<B: AsRef<[u8]>>(base64: B) -> Vec<u8> {
     let bytes: Vec<u8> = base64.as_ref()
         .iter()
         .cloned()
-        .filter(|c| *c != 10) // Ignore line feed for now
+        .filter(|c| *c != 10 && *c != 61) // filter out line feed and =
         .map(base_64_character_to_byte)
         .collect();
 
-    dbg!(&bytes);
+    let padding_count = match bytes.len() % 4 {
+        0 => 0,
+        2 => 2, 
+        3 => 1,
+        1 => panic!("Invalid base64"),
+        _ => unreachable!(),
+    };
 
-    let mut reader = BufReader::new(bytes.as_slice());
+    let padding = match padding_count {
+        1 => vec![0],
+        2 => vec![0, 0],
+        _ => Vec::new(),
+    };
+    
+    let padded_bytes = [bytes, padding].concat();
+
+    let mut reader = BufReader::new(padded_bytes.as_slice());
 
     let mut working_buffer: [u8; 4] = [0, 0, 0, 0];
     let mut result = Vec::new();
-
+    
     while let Ok(()) = reader.read_exact(&mut working_buffer) {
-        result.push(working_buffer[0] << 2 | (working_buffer[1] & 0b0011_0000 >> 4));
-        result.push((working_buffer[1] & 0b0000_1111 << 4) | (working_buffer[2] & 0b0011_1100 >> 2));
-        result.push((working_buffer[2] & 0b0000_0011 << 6) | working_buffer[3]);
+        result.push(working_buffer[0] << 2 | (working_buffer[1] & 0b0011_0000) >> 4);
+        result.push((working_buffer[1] & 0b0000_1111) << 4 | (working_buffer[2] & 0b0011_1100) >> 2);
+        result.push((working_buffer[2] & 0b0000_0011) << 6 | working_buffer[3]);
     }
 
-    result
+    let result_length = result.len() - padding_count;
+
+    result.into_iter().take(result_length).collect()
 }
 
 #[cfg(test)]
@@ -164,13 +160,33 @@ mod tests {
     }
 
     #[test]
-    fn test_base64_to_bytes() {
-        let _original = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d";
-        let original = "010101";
+    fn test_base64_to_bytes_same_input_padding_0() {
+        let original = "Man";
 
-        let base64 = dbg!(hex_to_base64(original));
+        let base64 = string_to_base64(original);
         let bytes = base64_to_bytes(base64);
 
-        assert_eq!(bytes_to_hex_string(&bytes), original);
+        assert_eq!(String::from_utf8_lossy(&bytes), original);
+    }
+
+    #[test]
+    fn test_base64_to_bytes_same_input_padding_1() {
+        let original = "Ma";
+
+        let base64 = string_to_base64(original);
+        let bytes = base64_to_bytes(base64);
+
+        assert_eq!(String::from_utf8_lossy(&bytes), original);
+    }
+
+    #[test]
+    fn test_base64_to_bytes_same_input_padding_2() {
+        let original = "M";
+
+        let base64 = string_to_base64(original);
+        let bytes = base64_to_bytes(base64);
+
+        assert_eq!(String::from_utf8_lossy(&bytes), original);
     }
 }
+
