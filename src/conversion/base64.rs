@@ -56,6 +56,10 @@ pub fn bytes_to_base64(bytes: &[u8]) -> String {
         .collect()
 }
 
+pub fn base64_to_bytes<B: AsRef<[u8]>>(base64: B) -> Vec<u8> {
+    todo!()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

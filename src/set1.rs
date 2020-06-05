@@ -146,4 +146,15 @@ pub fn challenge_5() {
 // blatant errors in this text. In particular: the "wokka wokka!!!" edit distance really is 37.
 
 #[test]
-pub fn challenge_6() {}
+pub fn challenge_6() {
+    use std::fs::File;
+    use std::io::{BufReader, Read};
+
+    let file = File::open("files/6.txt").unwrap();
+    let mut reader = BufReader::new(file);
+
+    let mut buffer = Vec::new();
+    reader.read_to_end(&mut buffer).unwrap();
+
+    let bytes = crate::conversion::base64::base64_to_bytes(&buffer);
+}
