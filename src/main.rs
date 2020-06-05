@@ -1,7 +1,8 @@
 pub mod byte_operations;
 pub mod ciphers;
-pub mod decode;
 pub mod conversion;
+pub mod decode;
+pub mod math;
 pub mod utils;
 
 #[cfg(test)]
