@@ -59,31 +59,29 @@ pub fn challenge_3() {
 // (Your code from #3 should help.) 
 #[test]
 fn challenge_4() {
-    use std::collections::HashMap;
     use std::io::{BufRead, BufReader};
     use std::fs::File;
 
     let file = File::open("files/4.txt").unwrap();
     let reader = BufReader::new(file);
 
-    let mut results = HashMap::new();
+    let mut results = Vec::new();
 
     for line in reader.lines() {
         let line = line.unwrap();
         let bytes = hex_string_to_bytes(&line);
 
         let (message, score) = decode::single_byte_xor(&bytes);
-        results.insert(score, message);
+        results.push((message, score));
     }
 
-    let (score, message) = results
+    let message = results
         .into_iter()
-        .max_by_key(|(_, score)| score.clone())
+        .max_by_key(|(_, score)| *score)
+        .map(|(message, _)| message)
         .unwrap();
 
-    dbg!(message);
-    dbg!(score);
-    assert!(false);
+    assert_eq!(message, "Now that the party is jumping\n");
 }
 
 // Implement repeating-key XOR
