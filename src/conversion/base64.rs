@@ -1,6 +1,6 @@
 use std::io::{BufReader, Read};
 
-use crate::conversion::hex::hex_string_to_bytes;
+use crate::conversion::hex::{hex_string_to_bytes, bytes_to_hex_string};
 
 #[rustfmt::skip]
 const BASE_64_TABLE: [char; 64] = [
@@ -56,8 +56,45 @@ pub fn bytes_to_base64(bytes: &[u8]) -> String {
         .collect()
 }
 
+pub fn base_64_character_to_byte(c: u8) -> u8 {
+    if c >= 65 && c <= 90 {
+        c - 65
+    } else if c >= 97 && c <= 122 {
+        c - 71
+    } else if c >= 48 && c <= 57 {
+        c + 4
+    } else if c == 43 {
+        62
+    } else if c == 47 {
+        63
+    } else if c == 61 {
+        0
+    } else {
+        unreachable!()
+    }
+}
+
+#[rustfmt::skip]
 pub fn base64_to_bytes<B: AsRef<[u8]>>(base64: B) -> Vec<u8> {
-    todo!()
+    let bytes: Vec<u8> = base64.as_ref()
+        .iter()
+        .cloned()
+        .filter(|c| *c != 10) // Ignore line feed for now
+        .map(base_64_character_to_byte)
+        .collect();
+
+    let mut reader = BufReader::new(bytes.as_slice());
+
+    let mut working_buffer: [u8; 4] = [0, 0, 0, 0];
+    let mut result = Vec::new();
+
+    while let Ok(()) = reader.read_exact(&mut working_buffer) {
+        result.push(working_buffer[0] << 2 | (working_buffer[1] & 0b0011_0000 >> 4));
+        result.push((working_buffer[1] & 0b0000_1111 << 4) | (working_buffer[2] & 0b0011_1100 >> 2));
+        result.push((working_buffer[2] & 0b0000_0011 << 6) | working_buffer[3]);
+    }
+
+    result
 }
 
 #[cfg(test)]
@@ -65,15 +102,26 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_convert_base64() {
+    fn test_convert_string_to_base64() {
         assert_eq!(string_to_base64("Ow!"), "T3ch")
     }
 
     #[test]
-    fn test_convert_base64_complex() {
+    fn test_convert_hex_to_base64_complex() {
         let test_string = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d";
         let expected_output = "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t";
 
         assert_eq!(hex_to_base64(test_string), expected_output);
+    }
+
+    #[test]
+    fn test_base64_to_bytes() {
+        let test_string = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d";
+        let expected_output = "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t";
+
+        let base64 = hex_to_base64(test_string);
+        let bytes = base64_to_bytes(base64);
+
+        assert_eq!(bytes_to_hex_string(&bytes), test_string);
     }
 }
