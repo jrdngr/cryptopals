@@ -106,18 +106,14 @@ fn challenge_4() {
 pub fn challenge_5() {
     use crate::ciphers::repeating_key_xor;
 
-    let input_line_1 = "Burning 'em, if you ain't quick and nimble";
-    let input_line_2 = "I go crazy when I hear a cymbal";
+    let input = "Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal";
     let key = "ICE";
 
     let key_bytes: Vec<u8> = key.bytes().collect();
 
-    let result_line_1 = repeating_key_xor(input_line_1.as_bytes(), &key_bytes);
-    let _result_line_1 = bytes_to_hex_string(&result_line_1);
-    
-    let result_line_2 = repeating_key_xor(input_line_2.as_bytes(), &key_bytes);
-    let _result_line_2 = bytes_to_hex_string(&result_line_2);
+    let result = repeating_key_xor(input.as_bytes(), &key_bytes);
+    let result = bytes_to_hex_string(&result);
 
-    // assert_eq!(result_line_1, "0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272");
-    // assert_eq!(result_line_2, "a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f");
+    assert_eq!(result, "0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f");
 }
+

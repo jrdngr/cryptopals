@@ -13,16 +13,11 @@ pub fn hex_string_to_bytes(hex_string: &str) -> Vec<u8> {
 }
 
 pub fn bytes_to_hex_string(bytes: &[u8]) -> String {
-    let result: Vec<[char; 2]> = bytes.iter().map(|b| byte_to_ascii_hex_pair(*b)).collect();
+    let result: Vec<[char; 2]> = bytes
+        .iter()
+        .map(|b| byte_to_ascii_hex_pair(*b)).collect();
 
-    let start = match result.get(0) {
-        Some([a, _]) if *a == '0' => 1,
-        _ => 0,
-    };
-
-    dbg!(start);
-
-    result.iter().flatten().skip(start).collect()
+    result.iter().flatten().collect()
 }
 
 pub fn ascii_hex_to_byte(hex: u8) -> u8 {
@@ -89,7 +84,7 @@ mod tests {
         let test_bytes = vec![
             1, 192, 17, 16, 1, 240, 16, 16, 0, 97, 160, 36, 181, 53, 53, 0, 145, 129, 193,
         ];
-        let expected_output = "1c0111001f010100061a024b53535009181c1";
+        let expected_output = "01c0111001f010100061a024b53535009181c1";
         assert_eq!(bytes_to_hex_string(&test_bytes), expected_output);
     }
 }
