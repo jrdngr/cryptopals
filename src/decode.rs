@@ -33,6 +33,6 @@ pub fn single_byte_xor<B: AsRef<[u8]>>(bytes: B) -> (String, usize) {
     (message, score)
 }
 
-pub fn repeating_byte_xor<B: AsRef<[u8]>>(bytes: B) -> (String, usize) {
+pub fn repeating_byte_xor<B: AsRef<[u8]>>(_bytes: B) -> (String, usize) {
     todo!()
 }

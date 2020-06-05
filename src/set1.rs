@@ -156,5 +156,5 @@ pub fn challenge_6() {
     let mut buffer = Vec::new();
     reader.read_to_end(&mut buffer).unwrap();
 
-    let bytes = crate::conversion::base64::base64_to_bytes(&buffer);
+    let _bytes = crate::conversion::base64::base64_to_bytes(&buffer);
 }
