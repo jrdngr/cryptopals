@@ -83,6 +83,8 @@ pub fn base64_to_bytes<B: AsRef<[u8]>>(base64: B) -> Vec<u8> {
         .map(base_64_character_to_byte)
         .collect();
 
+    dbg!(&bytes);
+
     let mut reader = BufReader::new(bytes.as_slice());
 
     let mut working_buffer: [u8; 4] = [0, 0, 0, 0];
@@ -116,12 +118,12 @@ mod tests {
 
     #[test]
     fn test_base64_to_bytes() {
-        let test_string = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d";
-        let expected_output = "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t";
+        let original = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d";
+        let original = "010101";
 
-        let base64 = hex_to_base64(test_string);
+        let base64 = dbg!(hex_to_base64(original));
         let bytes = base64_to_bytes(base64);
 
-        assert_eq!(bytes_to_hex_string(&bytes), test_string);
+        assert_eq!(bytes_to_hex_string(&bytes), original);
     }
 }
