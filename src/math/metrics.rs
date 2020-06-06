@@ -1,14 +1,16 @@
-pub fn hamming_distance(str_1: &str, str_2: &str) -> usize {
-    let length = str_1.len();
+pub fn hamming_distance<B: AsRef<[u8]>>(bytes_1: B, bytes_2: B) -> usize {
+    let bytes_1 = bytes_1.as_ref();
+    let bytes_2 = bytes_2.as_ref();
 
-    if str_2.len() != length {
+    let length = bytes_1.len();
+
+    if bytes_2.len() != length {
         panic!("Strings must be the same length");
     }
 
-    let distance = str_1
-        .bytes()
-        .zip(str_2.bytes())
-        .map(|(b1, b2)| byte_distance(b1, b2))
+    let distance = bytes_1.iter()
+        .zip(bytes_2.iter())
+        .map(|(b1, b2)| byte_distance(*b1, *b2))
         .sum();
 
     distance
