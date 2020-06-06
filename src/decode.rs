@@ -1,9 +1,15 @@
 use std::collections::HashSet;
 
-use crate::ciphers::single_byte_xor as encode_single_byte_xor;
+use crate::ciphers;
 
-pub fn single_byte_xor<B: AsRef<[u8]>>(bytes: B) -> (String, usize) {
-    let mut result: Vec<(String, usize)> = Vec::new();
+pub struct SingleByteXorResult {
+    pub message: String,
+    pub score: usize,
+    pub xor_byte: u8,
+}
+
+pub fn single_byte_xor<B: AsRef<[u8]>>(bytes: B) -> SingleByteXorResult {
+    let mut result: Vec<SingleByteXorResult> = Vec::new();
 
     let most_common_letters: HashSet<char> = [
         'E', 'T', 'A', 'O', 'I', 'N', 'S', 'H', 'R', 'D', 'L', 'U', 'e', 't', 'a', 'o', 'i', 'n',
@@ -14,41 +20,50 @@ pub fn single_byte_xor<B: AsRef<[u8]>>(bytes: B) -> (String, usize) {
     .collect();
 
     for xor_byte in 0..127 {
-        let result_bytes = encode_single_byte_xor(bytes.as_ref(), xor_byte);
-        let result_string = String::from_utf8_lossy(&result_bytes).into_owned();
+        let result_bytes = ciphers::single_byte_xor(bytes.as_ref(), xor_byte);
+        let message = String::from_utf8_lossy(&result_bytes).into_owned();
 
         let score: usize = result_bytes
             .into_iter()
             .filter(|byte| most_common_letters.contains(&(*byte as char)))
             .count();
 
-        result.push((result_string, score));
+        result.push(SingleByteXorResult { message, score, xor_byte });
     }
 
-    let (message, score) = result
+    result
         .into_iter()
-        .max_by_key(|(_, score)| score.clone())
-        .unwrap();
-
-    (message, score)
+        .max_by_key(|SingleByteXorResult { score, ..}| score.clone())
+        .unwrap()
 }
 
-pub fn repeating_byte_xor<B: AsRef<[u8]>>(bytes: B) -> (String, usize) {
+pub fn repeating_byte_xor<B: AsRef<[u8]>>(bytes: B) -> Vec<String> {
     let bytes = Vec::from(bytes.as_ref());
 
-    let key_size = guess_key_size(&bytes);
+    let mut result = Vec::new();
 
-    todo!()
+    let key_sizes = rank_key_sizes(&bytes, 40);
+    for key_size in &key_sizes[0..3] {
+        let blocks = transpose_by_key_size(&bytes, *key_size);
+        
+        let mut key = Vec::new();
+
+        for block in blocks {
+            let single_byte_xor_result = single_byte_xor(&block);
+            key.push(single_byte_xor_result.xor_byte);
+        }
+
+        let message = ciphers::repeating_key_xor(&bytes, &key);
+        result.push(String::from_utf8_lossy(&message).to_string());
+    }
+
+    result
 }
 
-type Score = usize;
-type KeySize = usize;
-
-fn guess_key_size(bytes: &[u8]) -> Vec<(Score, KeySize)> {
+fn rank_key_sizes(bytes: &[u8], max_key_size: usize) -> Vec<usize> {
     use crate::math::metrics::hamming_distance;
 
-    let length = bytes.len();
-    let max_key_size = 40.min(length / 4);
+    let max_key_size = max_key_size.min(bytes.len() / 4);
 
     let mut key_size_scores = Vec::new();
 
@@ -78,7 +93,22 @@ fn guess_key_size(bytes: &[u8]) -> Vec<(Score, KeySize)> {
 
     key_size_scores.sort_by_key(|(score, _)| *score);
 
-    key_size_scores
+    key_size_scores.into_iter().map(|(_, key_size)| key_size).collect()
+}
+
+fn transpose_by_key_size(bytes: &[u8], key_size: usize) -> Vec<Vec<u8>> {
+    let mut result = Vec::new();
+
+    for _ in 0..key_size {
+        result.push(Vec::new());
+    }
+
+    for (index, byte) in bytes.iter().cloned().enumerate() {
+        let bucket = index % key_size;
+        result[bucket].push(byte);
+    }
+
+    result
 }
 
 #[cfg(test)]
@@ -93,11 +123,11 @@ mod tests {
         // let input = "Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal";
         // let key = "ICE";
 
-        let result = guess_key_size(&hex_string_to_bytes(encrypted));
+        let result = rank_key_sizes(&hex_string_to_bytes(encrypted), 10);
 
         let mut is_answer_in_top_3 = false;
 
-        for (_, key_size) in result {
+        for key_size in result {
             if key_size == 3 {
                 is_answer_in_top_3 = true;
                 break;

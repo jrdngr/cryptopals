@@ -49,7 +49,7 @@ pub fn challenge_3() {
     let bytes =
         hex_string_to_bytes("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736");
 
-    let (message, _) = decode::single_byte_xor(&bytes);
+    let message = decode::single_byte_xor(&bytes).message;
 
     assert_eq!(message, "Cooking MC's like a pound of bacon");
 }
@@ -61,6 +61,7 @@ pub fn challenge_3() {
 fn challenge_4() {
     use std::fs::File;
     use std::io::{BufRead, BufReader};
+    use decode::SingleByteXorResult;
 
     let file = File::open("files/4.txt").unwrap();
     let reader = BufReader::new(file);
@@ -71,7 +72,7 @@ fn challenge_4() {
         let line = line.unwrap();
         let bytes = hex_string_to_bytes(&line);
 
-        let (message, score) = decode::single_byte_xor(&bytes);
+        let SingleByteXorResult { message, score, .. } = decode::single_byte_xor(&bytes);
         results.push((message, score));
     }
 
@@ -156,5 +157,14 @@ pub fn challenge_6() {
     let mut buffer = Vec::new();
     reader.read_to_end(&mut buffer).unwrap();
 
-    let _bytes = crate::conversion::base64::base64_to_bytes(&buffer);
+    let bytes = crate::conversion::base64::base64_to_bytes(&buffer);
+
+    let messages = decode::repeating_byte_xor(&bytes);
+
+    for message in messages {
+        println!("{}", message);
+        println!("-----\n\n\n\n\n-----")
+    }
+
+    assert!(false);
 }
